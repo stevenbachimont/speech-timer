@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Timer - Standalone</title>
+    <style>
+        /* CSS intégré - version condensée */
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;color:#333;position:relative}
+        body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiBmaWxsPSIjNjY3ZWVhIi8+Cjx0ZXh0IHg9IjI1NiIgeT0iMjgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAwIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+8J+QsTwvdGV4dD4KPC9zdmc+');background-size:300px 300px;background-position:center;background-repeat:no-repeat;background-attachment:fixed;opacity:0.15;pointer-events:none;z-index:-1}
+        .container{max-width:1200px;margin:0 auto;padding:20px}
+        header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:20px;border-radius:15px;box-shadow:0 8px 32px rgba(0,0,0,0.1)}
+        .header-controls{display:flex;align-items:center;gap:20px}
+        .import-export-controls{display:flex;align-items:center;gap:10px}
+        h1{color:white;font-size:2.5rem;font-weight:300}
+        .btn{padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-size:1rem;font-weight:500;transition:background-color 0.3s ease,box-shadow 0.3s ease;text-decoration:none;display:inline-block}
+        .btn-primary{background:linear-gradient(45deg,#ff6b6b,#ee5a24);color:white;box-shadow:0 4px 15px rgba(255,107,107,0.4)}
+        .btn-primary:hover{box-shadow:0 6px 20px rgba(255,107,107,0.6)}
+        .btn-secondary{background:#6c757d;color:white}
+        .btn-secondary:hover{background:#5a6268}
+        .btn-success{background:linear-gradient(45deg,#51cf66,#40c057);color:white;box-shadow:0 4px 15px rgba(81,207,102,0.4)}
+        .btn-warning{background:linear-gradient(45deg,#ffd43b,#fab005);color:#333;box-shadow:0 4px 15px rgba(255,212,59,0.4)}
+        .btn-danger{background:linear-gradient(45deg,#ff6b6b,#e03131);color:white;box-shadow:0 4px 15px rgba(255,107,107,0.4)}
+        .btn-fullscreen{background:linear-gradient(45deg,#339af0,#228be6);color:white;box-shadow:0 4px 15px rgba(51,154,240,0.4)}
+        .timers-container{display:flex;flex-direction:column;gap:20px;margin-bottom:30px}
+        .timer-card{background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);border-radius:15px;padding:25px;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.2);transition:background-color 0.3s ease,box-shadow 0.3s ease}
+        .timer-card:hover{box-shadow:0 12px 40px rgba(0,0,0,0.15)}
+        .timer-card.active{border:2px solid #51cf66;box-shadow:0 8px 32px rgba(81,207,102,0.3)}
+        .timer-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+        .timer-name-container{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+        .timer-name{font-size:1.3rem;font-weight:600;color:#333;flex:1}
+        .btn-rename{background:none;border:none;font-size:1rem;cursor:pointer;padding:5px;border-radius:3px;transition:background-color 0.2s ease;opacity:0.7}
+        .btn-rename:hover{background-color:#f8f9fa;opacity:1}
+        .timer-controls{display:flex;gap:10px}
+        .timer-display{text-align:center;margin:20px 0}
+            .time{font-size:3rem;font-weight:300;color:#333;font-family:'Courier New',monospace;margin-bottom:10px;transition:color 0.3s ease}
+            .timer-orange .time{color:#ff8c00;text-shadow:0 0 10px rgba(255,140,0,0.3)}
+            .timer-red .time{color:#dc2626;text-shadow:0 0 15px rgba(220,38,38,0.4)}
+            .timer-red-blink .time{color:#dc2626;text-shadow:0 0 20px rgba(220,38,38,0.6);animation:blink-red 0.5s infinite alternate}
+            @keyframes blink-red{0%{opacity:1;transform:scale(1)}100%{opacity:0.7;transform:scale(1.05)}}
+        .time-label{font-size:0.9rem;color:#666;text-align:center;margin-bottom:10px;font-weight:500}
+        .progress-bar{width:100%;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;margin:15px 0}
+        .progress-fill{height:100%;background:linear-gradient(45deg,#51cf66,#40c057);border-radius:4px;transition:width 0.3s ease;width:0%}
+        .timer-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+        .timer-actions .btn{flex:1;min-width:80px}
+        .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background-color:rgba(0,0,0,0.5);backdrop-filter:blur(5px)}
+        .modal-content{background:white;margin:5% auto;padding:30px;border-radius:15px;width:90%;max-width:500px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative}
+        .close{position:absolute;right:20px;top:20px;font-size:28px;font-weight:bold;cursor:pointer;color:#aaa}
+        .close:hover{color:#333}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;font-weight:500;color:#333}
+        .form-group input{width:100%;padding:12px;border:2px solid #e9ecef;border-radius:8px;font-size:1rem;transition:border-color 0.3s ease}
+        .form-group input:focus{outline:none;border-color:#339af0;box-shadow:0 0 0 3px rgba(51,154,240,0.1)}
+        .form-actions{display:flex;gap:15px;justify-content:flex-end;margin-top:25px}
+        @media (max-width:768px){.container{padding:15px}header{flex-direction:column;gap:20px;text-align:center}h1{font-size:2rem}.timers-container{flex-direction:column}.timer-actions{flex-direction:column}.timer-actions .btn{flex:none}.form-actions{flex-direction:column}.modal-content{margin:2% auto;max-height:95vh;padding:20px}.options-container{max-height:50vh;overflow-y:auto;padding-right:10px}.form-actions{position:sticky;bottom:0;background:white;padding:15px 0;border-top:1px solid #eee;margin-top:15px}}
+        @media (max-width:480px){.timer-card{padding:20px}.time{font-size:2.5rem}}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Speech Timer</h1>
+            <div class="header-controls">
+                <button id="addTimerBtn" class="btn btn-primary">+ Ajouter un Timer</button>
+                <div class="import-export-controls">
+                    <button id="exportBtn" class="btn btn-secondary">📤 Exporter Tous</button>
+                    <button id="importBtn" class="btn btn-secondary">📥 Importer</button>
+                    <input type="file" id="importFile" accept=".xml" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <div class="timers-container" id="timersContainer">
+            <!-- Les timers seront ajoutés dynamiquement ici -->
+        </div>
+
+        <div class="modal" id="addTimerModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Ajouter un nouveau timer</h2>
+                <form id="addTimerForm">
+                    <div class="form-group">
+                        <label for="timerName">Nom du timer :</label>
+                        <input type="text" id="timerName" required placeholder="Ex: Présentation, Débat, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Le timer n'a pas de durée fixe - seuls les participants ont des temps de parole</label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Créer le Timer</button>
+                        <button type="button" class="btn btn-secondary" id="cancelAddTimer">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript intégré - version condensée de la classe TimerManager
+        class TimerManager {
+            constructor() {
+                this.timers = [];
+                this.activeTimerId = null;
+                this.intervalId = null;
+                this.initializeEventListeners();
+                this.loadTimersFromStorage();
+            }
+
+            initializeEventListeners() {
+                document.getElementById('addTimerBtn').addEventListener('click', () => this.showAddTimerModal());
+                document.getElementById('addTimerForm').addEventListener('submit', (e) => { e.preventDefault(); this.addTimer(); });
+                document.getElementById('cancelAddTimer').addEventListener('click', () => this.hideAddTimerModal());
+                document.querySelector('.close').addEventListener('click', () => this.hideAddTimerModal());
+                document.getElementById('exportBtn').addEventListener('click', () => this.exportTimers());
+                document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+                document.getElementById('importFile').addEventListener('change', (e) => this.importTimers(e.target.files[0]));
+            }
+
+            showAddTimerModal() {
+                document.getElementById('addTimerModal').style.display = 'block';
+                document.getElementById('timerName').focus();
+            }
+
+            hideAddTimerModal() {
+                document.getElementById('addTimerModal').style.display = 'none';
+                document.getElementById('addTimerForm').reset();
+            }
+
+            addTimer() {
+                const name = document.getElementById('timerName').value.trim();
+                if (!name) { alert('Veuillez saisir un nom pour le timer'); return; }
+
+                const timer = {
+                    id: Date.now(),
+                    name: name,
+                    isRunning: false,
+                    isPaused: false,
+                    isFinished: false,
+                    participants: [],
+                    currentParticipantIndex: 0,
+                    autoRotation: false,
+                    totalTimeElapsed: 0
+                };
+
+                this.timers.push(timer);
+                this.renderTimers();
+                this.saveTimersToStorage();
+                this.hideAddTimerModal();
+            }
+
+            renderTimers() {
+                const container = document.getElementById('timersContainer');
+                container.innerHTML = '';
+
+                this.timers.forEach(timer => {
+                    const timerCard = this.createTimerCard(timer);
+                    container.appendChild(timerCard);
+                });
+            }
+
+            createTimerCard(timer) {
+                const card = document.createElement('div');
+                card.id = 'timer-' + timer.id;
+
+                const currentParticipant = timer.participants[timer.currentParticipantIndex];
+                
+                // Vérifier l'état du timer selon le pourcentage de temps restant
+                const isHalfTime = currentParticipant && currentParticipant.isHalfTime && !currentParticipant.isFinished;
+                const isRedTime = currentParticipant && currentParticipant.isRedTime && !currentParticipant.isFinished;
+                const isRedBlinkTime = currentParticipant && currentParticipant.isRedBlinkTime && !currentParticipant.isFinished;
+                
+                let timerStateClass = '';
+                if (isRedBlinkTime) {
+                    timerStateClass = ' timer-red-blink';
+                } else if (isRedTime) {
+                    timerStateClass = ' timer-red';
+                } else if (isHalfTime) {
+                    timerStateClass = ' timer-orange';
+                }
+                
+                card.className = 'timer-card' + (timer.isRunning ? ' active' : '') + (timer.isFinished ? ' timer-finished' : '') + timerStateClass;
+                let displayTime, displayLabel;
+                if (currentParticipant && !currentParticipant.isFinished) {
+                    displayTime = this.formatTime(currentParticipant.remainingTime);
+                    const statusIcon = currentParticipant.isPaused ? '⏸️' : '▶️';
+                    displayLabel = statusIcon + ' Temps restant - ' + currentParticipant.name;
+                } else {
+                    displayTime = '00:00';
+                    displayLabel = 'Aucun participant';
+                }
+
+                card.innerHTML = `
+                    <div class="timer-header">
+                        <div class="timer-name-container">
+                            <div class="timer-name" id="timer-name-${timer.id}">${timer.name}</div>
+                            <button class="btn-rename" onclick="timerManager.startRenameTimer(${timer.id})" title="Renommer">✏️</button>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn btn-danger" onclick="timerManager.deleteTimer(${timer.id})">Supprimer</button>
+                        </div>
+                    </div>
+                    <div class="timer-display">
+                        <div class="time">${displayTime}</div>
+                        <div class="time-label">${displayLabel}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="timer-actions">
+                        <button class="btn ${timer.isRunning ? 'btn-warning' : 'btn-success'}" onclick="timerManager.toggleTimer(${timer.id})">
+                            ${timer.isRunning ? 'Pause' : 'Démarrer'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="timerManager.resetTimer(${timer.id})">Reset</button>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            toggleTimer(timerId) {
+                const timer = this.timers.find(t => t.id === timerId);
+                if (!timer) return;
+
+                if (this.activeTimerId && this.activeTimerId !== timerId) {
+                    this.pauseActiveTimer();
+                }
+
+                if (timer.isRunning) {
+                    this.pauseTimer(timerId);
+                } else {
+                    this.startTimer(timerId);
+                }
+            }
+
+            startTimer(timerId) {
+                const timer = this.timers.find(t => t.id === timerId);
+                if (!timer || timer.isFinished) return;
+
+                timer.isRunning = true;
+                timer.isPaused = false;
+                this.activeTimerId = timerId;
+
+                if (!this.intervalId) {
+                    this.intervalId = setInterval(() => this.updateActiveTimer(), 1000);
+                }
+
+                this.renderTimers();
+            }
+
+            pauseTimer(timerId) {
+                const timer = this.timers.find(t => t.id === timerId);
+                if (!timer) return;
+
+                timer.isRunning = false;
+                timer.isPaused = true;
+
+                if (this.activeTimerId === timerId) {
+                    this.activeTimerId = null;
+                }
+
+                this.renderTimers();
+            }
+
+            pauseActiveTimer() {
+                if (this.activeTimerId) {
+                    this.pauseTimer(this.activeTimerId);
+                }
+            }
+
+            updateActiveTimer() {
+                if (!this.activeTimerId) {
+                    clearInterval(this.intervalId);
+                    this.intervalId = null;
+                    return;
+                }
+
+                const timer = this.timers.find(t => t.id === this.activeTimerId);
+                if (!timer || !timer.isRunning) return;
+
+                timer.totalTimeElapsed++;
+                
+                // Vérifier si on arrive à la moitié du temps (flash à la moitié)
+                if (timer.participants.length > 0 && timer.currentParticipantIndex < timer.participants.length) {
+                    const currentParticipant = timer.participants[timer.currentParticipantIndex];
+                    if (!currentParticipant.isFinished && !currentParticipant.isPaused) {
+                        currentParticipant.remainingTime--;
+                        currentParticipant.timeElapsed++;
+                        
+                        const halfTime = Math.floor(currentParticipant.time / 2);
+                        if (currentParticipant.timeElapsed === halfTime && !currentParticipant.halfTimeFlashTriggered) {
+                            this.flashScreen();
+                            currentParticipant.halfTimeFlashTriggered = true;
+                        }
+                        
+                        // Marquer le participant comme étant à la moitié du temps
+                        currentParticipant.isHalfTime = currentParticipant.timeElapsed >= halfTime;
+                        
+                        // Marquer le participant selon le pourcentage de temps restant
+                        const timeRemaining = currentParticipant.remainingTime;
+                        const totalTime = currentParticipant.time;
+                        const percentageRemaining = (timeRemaining / totalTime) * 100;
+                        
+                        currentParticipant.isRedTime = percentageRemaining <= 20 && percentageRemaining > 10;
+                        currentParticipant.isRedBlinkTime = percentageRemaining <= 10;
+                        
+                        if (currentParticipant.remainingTime <= 0) {
+                            currentParticipant.remainingTime = 0;
+                            currentParticipant.isFinished = true;
+                            currentParticipant.isPaused = true;
+                            timer.isRunning = false;
+                            this.activeTimerId = null;
+                        }
+                    }
+                }
+                
+                this.renderTimers();
+                this.saveTimersToStorage();
+            }
+
+            resetTimer(timerId) {
+                const timer = this.timers.find(t => t.id === timerId);
+                if (!timer) return;
+
+                timer.isRunning = false;
+                timer.isPaused = false;
+                timer.isFinished = false;
+                timer.currentParticipantIndex = 0;
+                timer.totalTimeElapsed = 0;
+
+                // Reset tous les participants
+                timer.participants.forEach(participant => {
+                    participant.remainingTime = participant.time;
+                    participant.isFinished = false;
+                    participant.isPaused = true;
+                    participant.timeElapsed = 0;
+                    participant.halfTimeFlashTriggered = false; // Reset du flag de flash
+                });
+
+                if (this.activeTimerId === timerId) {
+                    this.activeTimerId = null;
+                }
+
+                this.renderTimers();
+                this.saveTimersToStorage();
+            }
+
+            deleteTimer(timerId) {
+                if (confirm('Êtes-vous sûr de vouloir supprimer ce timer ?')) {
+                    this.timers = this.timers.filter(t => t.id !== timerId);
+                    
+                    if (this.activeTimerId === timerId) {
+                        this.activeTimerId = null;
+                    }
+
+                    this.renderTimers();
+                    this.saveTimersToStorage();
+                }
+            }
+
+            startRenameTimer(timerId) {
+                const timer = this.timers.find(t => t.id === timerId);
+                if (!timer) return;
+
+                const nameElement = document.getElementById(`timer-name-${timerId}`);
+                if (!nameElement) return;
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = timer.name;
+                input.className = 'timer-name-input';
+                input.style.cssText = 'background:transparent;border:2px solid #339af0;border-radius:5px;padding:5px 10px;font-size:1.2rem;font-weight:600;color:#333;width:100%;outline:none;';
+
+                nameElement.style.display = 'none';
+                nameElement.parentNode.insertBefore(input, nameElement);
+                input.focus();
+                input.select();
+
+                const saveRename = () => {
+                    const newName = input.value.trim();
+                    if (newName && newName !== timer.name) {
+                        timer.name = newName;
+                        nameElement.textContent = newName;
+                        this.saveTimersToStorage();
+                    }
+                    nameElement.style.display = 'block';
+                    input.remove();
+                };
+
+                const cancelRename = () => {
+                    nameElement.style.display = 'block';
+                    input.remove();
+                };
+
+                input.addEventListener('blur', saveRename);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); saveRename(); }
+                    else if (e.key === 'Escape') { e.preventDefault(); cancelRename(); }
+                });
+            }
+
+            formatTime(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                if (hours > 0) {
+                    return hours.toString().padStart(2, '0') + ':' + 
+                           minutes.toString().padStart(2, '0') + ':' + 
+                           secs.toString().padStart(2, '0');
+                }
+                return minutes.toString().padStart(2, '0') + ':' + 
+                       secs.toString().padStart(2, '0');
+            }
+
+            flashScreen() {
+                // Créer un flash blanc sur toute la fenêtre
+                const flash = document.createElement('div');
+                flash.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: white;
+                    z-index: 9999;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 0.1s ease;
+                `;
+                
+                document.body.appendChild(flash);
+                
+                // Animation du flash
+                requestAnimationFrame(() => {
+                    flash.style.opacity = '0.8';
+                    setTimeout(() => {
+                        flash.style.opacity = '0';
+                        setTimeout(() => {
+                            document.body.removeChild(flash);
+                        }, 100);
+                    }, 200);
+                });
+            }
+
+            saveTimersToStorage() {
+                localStorage.setItem('speechTimers', JSON.stringify(this.timers));
+            }
+
+            loadTimersFromStorage() {
+                const saved = localStorage.getItem('speechTimers');
+                if (saved) {
+                    this.timers = JSON.parse(saved);
+                    this.renderTimers();
+                }
+            }
+
+            exportTimers() {
+                if (this.timers.length === 0) {
+                    alert('Aucun timer à exporter');
+                    return;
+                }
+
+                try {
+                    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+                    xml += '<speechTimers version="2.0" exportDate="' + new Date().toISOString() + '">\n';
+                    
+                    this.timers.forEach(timer => {
+                        xml += '  <timer>\n';
+                        xml += '    <id>' + timer.id + '</id>\n';
+                        xml += '    <name>' + this.escapeXml(timer.name) + '</name>\n';
+                        xml += '    <isRunning>' + timer.isRunning + '</isRunning>\n';
+                        xml += '    <isPaused>' + timer.isPaused + '</isPaused>\n';
+                        xml += '    <isFinished>' + timer.isFinished + '</isFinished>\n';
+                        xml += '    <currentParticipantIndex>' + timer.currentParticipantIndex + '</currentParticipantIndex>\n';
+                        xml += '    <autoRotation>' + timer.autoRotation + '</autoRotation>\n';
+                        xml += '    <totalTimeElapsed>' + timer.totalTimeElapsed + '</totalTimeElapsed>\n';
+                        xml += '  </timer>\n';
+                    });
+                    
+                    xml += '</speechTimers>';
+
+                    const blob = new Blob([xml], { type: 'application/xml' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'speech-timers-' + new Date().toISOString().split('T')[0] + '.xml';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                } catch (error) {
+                    console.error('Erreur lors de l\'export:', error);
+                    alert('Erreur lors de l\'export: ' + error.message);
+                }
+            }
+
+            importTimers(file) {
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const xmlText = e.target.result;
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+                        
+                        if (xmlDoc.getElementsByTagName('parsererror').length > 0) {
+                            alert('Erreur: Le fichier XML n\'est pas valide');
+                            return;
+                        }
+                        
+                        const timers = xmlDoc.getElementsByTagName('timer');
+                        const importedTimers = [];
+
+                        for (let i = 0; i < timers.length; i++) {
+                            const timer = timers[i];
+                            const newTimer = {
+                                id: Date.now() + i,
+                                name: this.getXmlText(timer, 'name') || 'Timer sans nom',
+                                isRunning: false,
+                                isPaused: false,
+                                isFinished: false,
+                                currentParticipantIndex: parseInt(this.getXmlText(timer, 'currentParticipantIndex')) || 0,
+                                autoRotation: this.getXmlText(timer, 'autoRotation') === 'true',
+                                totalTimeElapsed: 0,
+                                participants: []
+                            };
+
+                            importedTimers.push(newTimer);
+                        }
+
+                        this.timers = this.timers.concat(importedTimers);
+                        this.renderTimers();
+                        this.saveTimersToStorage();
+                        
+                        alert(`Import réussi ! ${importedTimers.length} timer(s) importé(s)`);
+                    } catch (error) {
+                        console.error('Erreur lors de l\'import:', error);
+                        alert('Erreur lors de l\'import: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            escapeXml(text) {
+                if (!text) return '';
+                return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            }
+
+            getXmlText(parent, tagName) {
+                const element = parent.getElementsByTagName(tagName)[0];
+                return element ? element.textContent : '';
+            }
+        }
+
+        // Initialiser l'application
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerManager = new TimerManager();
+            window.timerManager = timerManager;
+
+            // Raccourcis clavier
+            document.addEventListener('keydown', (e) => {
+                if (e.code === 'Space' && window.timerManager.activeTimerId) {
+                    e.preventDefault();
+                    window.timerManager.toggleTimer(window.timerManager.activeTimerId);
+                }
+                if (e.code === 'Escape') {
+                    window.timerManager.hideAddTimerModal();
+                }
+            });
+
+            // Sauvegarder avant fermeture
+            window.addEventListener('beforeunload', () => {
+                window.timerManager.saveTimersToStorage();
+            });
+        });
+    </script>
+</body>
+</html>

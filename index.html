@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Timer</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Speech Timer">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Speech Timer</h1>
+            <div class="header-controls">
+                <button id="addTimerBtn" class="btn btn-primary">+ Ajouter un Timer</button>
+                <button id="helpBtn" class="btn btn-secondary">📖 Lisez-moi</button>
+                <div class="import-export-controls">
+                    <button id="exportBtn" class="btn btn-secondary">📤 Exporter Tous</button>
+                    <button id="importBtn" class="btn btn-secondary">📥 Importer</button>
+                    <input type="file" id="importFile" accept=".xml" style="display: none;">
+                </div>
+            </div>
+        </header>
+
+        <div class="timers-container" id="timersContainer">
+            <!-- Les timers seront ajoutés dynamiquement ici -->
+        </div>
+
+        <div class="modal" id="addTimerModal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>Ajouter un nouveau timer</h2>
+                <form id="addTimerForm">
+                    <div class="form-group">
+                        <label for="timerName">Nom du timer :</label>
+                        <input type="text" id="timerName" required placeholder="Ex: Présentation, Débat, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Le timer n'a pas de durée fixe - seuls les participants ont des temps de parole</label>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-toggle" id="allowNegativeTimeGlobal">
+                            <span class="btn-icon">⏰</span>
+                            Décompte négatif
+                        </button>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Créer le Timer</button>
+                        <button type="button" class="btn btn-secondary" id="cancelAddTimer">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="modal" id="participantsModal">
+            <div class="modal-content">
+                <span class="close" id="closeParticipantsModal">&times;</span>
+                <h2>Gérer les participants</h2>
+                <div class="participants-container">
+                    <div class="add-participant-form">
+                        <div class="form-group">
+                            <label for="participantName">Nom du participant :</label>
+                            <input type="text" id="participantName" placeholder="Ex: Jean, Marie, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label for="participantTime">Temps de parole (minutes) :</label>
+                            <input type="number" id="participantTime" min="1" max="60" value="5">
+                        </div>
+                        <button class="btn btn-primary" id="addParticipantBtn">Ajouter</button>
+                    </div>
+                    <div class="participants-list" id="participantsList">
+                        <!-- Les participants seront ajoutés ici -->
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="closeParticipantsBtn">Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="fullscreenOptionsModal">
+            <div class="modal-content">
+                <span class="close" id="closeFullscreenOptionsModal">&times;</span>
+                <h2>Options plein écran</h2>
+                <div class="options-container">
+                    <div class="option-group">
+                        <label for="backgroundColor">Couleur de fond :</label>
+                        <div class="color-options">
+                            <div class="color-option" data-color="linear-gradient(135deg, #667eea 0%, #764ba2 100%)" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #fa709a 0%, #fee140 100%)" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);"></div>
+                            <div class="color-option" data-color="linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);"></div>
+                            <div class="color-option" data-color="#000000" style="background: #000000;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="timerSize">Taille du timer :</label>
+                        <select id="timerSize">
+                            <option value="small">Petit (6rem)</option>
+                            <option value="medium" selected>Moyen (8rem)</option>
+                            <option value="large">Grand (10rem)</option>
+                            <option value="xlarge">Très grand (12rem)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="fullscreenMode">Mode plein écran :</label>
+                        <select id="fullscreenMode">
+                            <option value="auto" selected>Automatique (détection Windows)</option>
+                            <option value="window">Toujours en fenêtre d'abord</option>
+                            <option value="fullscreen">Toujours directement plein écran</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="participantSelect">Participant ciblé :</label>
+                        <select id="participantSelect">
+                            <option value="">Sélectionner un participant...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="participantMessage">Message personnalisé :</label>
+                        <textarea id="participantMessage" placeholder="Ex: Attention, il vous reste 2 minutes..."></textarea>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="showMessage"> Afficher le message dans le plein écran
+                        </label>
+                    </div>
+                    
+                    <div class="option-group">
+                        <button type="button" id="pushMessageBtn" class="btn btn-primary">📤 Push Message</button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="applyFullscreenOptions">Appliquer</button>
+                    <button type="button" class="btn btn-secondary" id="closeFullscreenOptionsBtn">Fermer</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="helpModal">
+            <div class="modal-content">
+                <span class="close" id="closeHelpModal">&times;</span>
+                <h2>Bienvenue dans Speech Timer</h2>
+                <div class="help-content">
+                    <div class="help-section">
+                        <h3>Qu'est-ce que Speech Timer ?</h3>
+                        <p>Speech Timer est une application de gestion de temps de parole conçue pour les débats, présentations, réunions et tout événement nécessitant un contrôle précis du temps alloué à chaque participant.</p>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Comment commencer ?</h3>
+                        <ol>
+                            <li><strong>Créer un timer :</strong> Cliquez sur "Ajouter un Timer" et donnez-lui un nom (ex: "Débat présidentiel")</li>
+                            <li><strong>Ajouter des participants :</strong> Cliquez sur "Gérer participants" et ajoutez chaque personne avec son temps de parole</li>
+                            <li><strong>Démarrer :</strong> Cliquez sur "Démarrer" pour commencer le chronométrage</li>
+                        </ol>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Fonctionnalités principales</h3>
+                        <ul>
+                            <li><strong>Chronométrage intelligent :</strong> Le timer change de couleur (orange à 50%, rouge à 20%, clignotant à 10%)</li>
+                            <li><strong>Gestion multi-participants :</strong> Ajoutez autant de participants que nécessaire</li>
+                            <li><strong>Rotation automatique :</strong> Activez pour passer automatiquement au participant suivant</li>
+                            <li><strong>Mode plein écran :</strong> Parfait pour les présentations publiques</li>
+                            <li><strong>Sauvegarde automatique :</strong> Vos timers sont sauvegardés localement</li>
+                            <li><strong>Export/Import :</strong> Partagez vos configurations entre sessions</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Personnalisation</h3>
+                        <ul>
+                            <li><strong>Couleurs de fond :</strong> Choisissez parmi 9 dégradés ou noir</li>
+                            <li><strong>Taille du timer :</strong> 4 tailles disponibles pour s'adapter à votre écran</li>
+                            <li><strong>Messages personnalisés :</strong> Affichez des alertes personnalisées</li>
+                            <li><strong>Décompte négatif :</strong> Option pour continuer après le temps alloué</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>Conseils d'utilisation</h3>
+                        <ul>
+                            <li>Utilisez le mode plein écran pour les présentations publiques</li>
+                            <li>Activez la rotation automatique pour les débats structurés</li>
+                            <li>Exportez vos configurations pour les réutiliser</li>
+                            <li>Le décompte négatif est utile pour les débats libres</li>
+                            <li>Les couleurs d'alerte aident les participants à gérer leur temps</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" id="closeHelpBtn">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <!-- PWA Service Worker -->
+    <script>
+        // Enregistrer le Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('SW enregistré: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('Échec d\'enregistrement du SW: ', registrationError);
+                    });
+            });
+        }
+        
+        // Gestion de l'installation PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Empêcher l'affichage automatique du prompt
+            e.preventDefault();
+            // Stocker l'événement pour l'utiliser plus tard
+            deferredPrompt = e;
+            
+            // Afficher un bouton d'installation personnalisé
+            showInstallButton();
+        });
+        
+        function showInstallButton() {
+            // Créer un bouton d'installation
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '📱 Installer l\'app';
+            installBtn.className = 'btn btn-primary';
+            installBtn.style.marginLeft = '10px';
+            installBtn.onclick = installApp;
+            
+            // Ajouter le bouton au header
+            const headerControls = document.querySelector('.header-controls');
+            if (headerControls) {
+                headerControls.appendChild(installBtn);
+            }
+        }
+        
+        function installApp() {
+            if (deferredPrompt) {
+                // Afficher le prompt d'installation
+                deferredPrompt.prompt();
+                
+                // Attendre la réponse de l'utilisateur
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('L\'utilisateur a accepté l\'installation');
+                    } else {
+                        console.log('L\'utilisateur a refusé l\'installation');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+        
+        // Détecter si l'app est installée
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('App installée avec succès');
+            // Masquer le bouton d'installation
+            const installBtn = document.querySelector('button[onclick="installApp()"]');
+            if (installBtn) {
+                installBtn.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

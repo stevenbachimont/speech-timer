@@ -1,0 +1,66 @@
+{
+  "name": "speech-timer",
+  "version": "3.4.0",
+  "description": "Application de timer pour discours avec gestion des participants, mode plein écran intelligent, guide d'utilisation intégré et support multi-écrans",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-win": "electron-builder --win",
+    "build-mac": "electron-builder --mac",
+    "build-linux": "electron-builder --linux",
+    "build-all": "electron-builder --win --mac --linux",
+    "dist": "electron-builder --publish=never",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean"
+  },
+  "keywords": ["timer", "speech", "electron", "desktop", "fullscreen", "multi-screen", "presentation", "debate", "pwa", "progressive-web-app"],
+  "author": "Steven BACHIMONT",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "rimraf": "^5.0.5"
+  },
+  "build": {
+    "appId": "com.speechtimer.app",
+    "productName": "Speech Timer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "script.js",
+      "style.css",
+      "package.json",
+      "manifest.json",
+      "sw.js",
+      "icon-192.png",
+      "icon-512.png"
+    ],
+    "win": {
+      "target": {
+        "target": "nsis",
+        "arch": ["x64", "arm64"]
+      },
+      "icon": "icon.png",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Speech Timer"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "icon.png"
+    }
+  }
+}
