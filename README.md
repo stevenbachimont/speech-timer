@@ -152,8 +152,7 @@ Cliquez sur le bouton "Lisez-moi" dans l'application pour accéder au guide int�
 ## 📞 Contact
 
 **Développé par Steven BACHIMONT**  
-Version 3.4.0 - 2024
+Version 3.4.0 - 2025
 
 ---
 
-*Speech Timer - Contrôlez le temps de parole avec précision et style* ⏱️✨
