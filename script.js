@@ -1217,7 +1217,7 @@ class TimerManager {
                         let intervalId = null;
                         let fullscreenOptions = {
                             backgroundColor: '${backgroundColor}',
-                            timerSize: 'medium',
+                            timerSize: '${this.fullscreenOptions.timerSize || 'medium'}',
                             participantMessage: '',
                             showMessage: false,
                             selectedParticipantId: null
@@ -1399,7 +1399,8 @@ class TimerManager {
                                     'small': '6rem',
                                     'medium': '8rem',
                                     'large': '10rem',
-                                    'xlarge': '12rem'
+                                    'xlarge': '12rem',
+                                    'xxlarge': '16rem'
                                 };
                                 timerElement.style.fontSize = sizes[options.timerSize] || '8rem';
                             }
@@ -1704,7 +1705,7 @@ class TimerManager {
                         };
 
                         // Validation des options
-                        const validSizes = ['small', 'medium', 'large', 'xlarge'];
+                        const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge'];
                         if (!validSizes.includes(importedOptions.timerSize)) {
                             importedOptions.timerSize = 'medium';
                         }
@@ -1945,7 +1946,7 @@ class TimerManager {
                         };
 
                         // Validation des options
-                        const validSizes = ['small', 'medium', 'large', 'xlarge'];
+                        const validSizes = ['small', 'medium', 'large', 'xlarge', 'xxlarge'];
                         if (!validSizes.includes(importedOptions.timerSize)) {
                             importedOptions.timerSize = 'medium';
                         }
@@ -2175,7 +2176,8 @@ class TimerManager {
             'small': '6rem',
             'medium': '8rem',
             'large': '10rem',
-            'xlarge': '12rem'
+            'xlarge': '12rem',
+            'xxlarge': '16rem'
         };
         return sizes[this.fullscreenOptions.timerSize] || '8rem';
     }
