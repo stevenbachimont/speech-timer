@@ -53,10 +53,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Speech Timer",
-      "installerSidebar": "icon-192.png",
-      "installerHeader": "icon-192.png",
-      "uninstallerSidebar": "icon-192.png"
+      "shortcutName": "Speech Timer"
     },
     "msi": {
       "oneClick": false,
