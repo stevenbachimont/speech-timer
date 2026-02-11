@@ -44,7 +44,7 @@
         { "target": "nsis", "arch": ["x64"] },
         { "target": "msi", "arch": ["x64"] }
       ],
-      "icon": "icon.png",
+      "icon": "icon-192.png",
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
@@ -53,7 +53,10 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Speech Timer"
+      "shortcutName": "Speech Timer",
+      "installerSidebar": "icon-192.png",
+      "installerHeader": "icon-192.png",
+      "uninstallerSidebar": "icon-192.png"
     },
     "msi": {
       "oneClick": false,
