@@ -44,7 +44,7 @@ Une application de gestion de temps de parole moderne et intuitive, conçue pour
 ### Version Desktop (Recommandée)
 1. Téléchargez la version pour votre plateforme :
    - **macOS** : `Speech Timer-3.4.0-arm64.dmg`
-   - **Windows** : `Speech Timer Setup 3.4.0.exe`
+   - **Windows** : `Speech Timer Setup 3.4.0.exe` (NSIS) et `Speech Timer Setup 3.4.0.msi` (Windows Installer)
    - **Linux** : `Speech Timer-3.4.0.AppImage`
 
 2. Installez selon votre système d'exploitation
@@ -126,7 +126,7 @@ TIMER 3.0/
 └── dist/                   # Dossier de build (ignoré par Git)
     ├── pwa/                # Version PWA
     ├── *.dmg               # Version macOS
-    ├── *.exe               # Version Windows
+    ├── *.exe, *.msi        # Version Windows (NSIS + MSI)
     └── *.AppImage          # Version Linux
 ```
 

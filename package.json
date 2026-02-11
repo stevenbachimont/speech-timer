@@ -40,15 +40,24 @@
       "icon-512.png"
     ],
     "win": {
-      "target": {
-        "target": "nsis",
-        "arch": ["x64", "arm64"]
-      },
+      "target": [
+        { "target": "nsis", "arch": ["x64", "arm64"] },
+        { "target": "msi", "arch": ["x64", "arm64"] }
+      ],
       "icon": "icon.png",
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Speech Timer"
+    },
+    "msi": {
+      "oneClick": false,
+      "perMachine": true,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,

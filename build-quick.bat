@@ -78,10 +78,9 @@ echo - **Usage**: Double-clic pour installer
 echo - **Avantages**: Application native macOS, intégration système complète
 echo.
 echo ### 🪟 Version Windows
-echo - **Fichier**: `Speech Timer Setup 3.0.0.exe` ^(x64^)
-echo - **Fichier**: `Speech Timer-3.0.0-arm64.dmg` ^(ARM64^)
-echo - **Usage**: Exécuter l'installateur
-echo - **Avantages**: Application native Windows, mode plein écran intelligent
+echo - **Fichiers**: `Speech Timer Setup 3.0.0.exe` ^(NSIS^) et `Speech Timer Setup 3.0.0.msi` ^(Windows Installer^) — x64 et ARM64
+echo - **Usage**: Exécuter l'installateur ^(.exe ou .msi^)
+echo - **Avantages**: Application native Windows, mode plein écran intelligent ; MSI adapté au déploiement en entreprise
 echo.
 echo ### 🐧 Version Linux
 echo - **Fichier**: `Speech Timer-3.0.0.AppImage` ^(x64^)
@@ -175,8 +174,8 @@ echo    📄 Standalone: dist\speech-timer-standalone.html
 where npm >nul 2>nul
 if %errorlevel% equ 0 (
     echo    🍎 macOS ARM64: Speech Timer-3.0.0-arm64.dmg
-    echo    🪟 Windows x64: Speech Timer Setup 3.0.0.exe
-    echo    🪟 Windows ARM64: Speech Timer-3.0.0-arm64.dmg
+    echo    🪟 Windows x64: Speech Timer Setup 3.0.0.exe + Speech Timer Setup 3.0.0.msi
+    echo    🪟 Windows ARM64: Speech Timer Setup 3.0.0-arm64.exe + Speech Timer Setup 3.0.0-arm64.msi
     echo    🐧 Linux x64: Speech Timer-3.0.0.AppImage
     echo    🐧 Linux ARM64: Speech Timer-3.0.0-arm64.AppImage
 )
