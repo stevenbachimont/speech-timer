@@ -44,7 +44,7 @@
         { "target": "nsis", "arch": ["x64"] },
         { "target": "msi", "arch": ["x64"] }
       ],
-      "icon": "icon-192.png",
+      "icon": "icon.png",
       "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
